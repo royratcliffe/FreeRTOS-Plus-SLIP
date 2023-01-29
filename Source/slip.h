@@ -42,6 +42,10 @@ typedef void *SLIPHandle_t;
 
 /*!
  * Creates a new SLIP intrastructure wrapper dynamically.
+ *
+ * Creates a new receiver and transmitter task with the necessary stack sizes,
+ * amounting to minimal size plus the maximum packet length. Reserve sufficient
+ * heap space for the new tasks and their stacks.
  */
 SLIPHandle_t xSLIPCreate(size_t xBufferSizeBytes, size_t xTriggerLevelBytes);
 

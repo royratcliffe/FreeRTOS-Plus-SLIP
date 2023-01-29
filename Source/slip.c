@@ -116,12 +116,6 @@ static size_t prvMessageBufferReceive(MessageBufferHandle_t hMessageBuffer, uint
 	return xReceivedBytes;
 }
 
-/*!
- * Reads a queue of stream buffers. Reads the queue, reads the stream.
- * Concurrency can easily overlap the stream and the queue. The queue blocks;
- * its stream buffers also block. Hence users can queue completed or uncompleted
- * buffers.
- */
 static portTASK_FUNCTION(prvTxTask, pvParameters)
 {
 	SLIP_t *slip = pvParameters;
@@ -130,7 +124,7 @@ static portTASK_FUNCTION(prvTxTask, pvParameters)
 	{
 		/*
 		 * The name of the data is transmit data even though the transmit task
-		 * receives it. The term "transmit" here refers to the pipeline as a
+		 * _receives_ it. The term "transmit" here refers to the pipeline as a
 		 * whole.
 		 */
 		size_t xReceivedBytes = prvMessageBufferReceive(slip->hTxMessageBuffer, ucTxData);
