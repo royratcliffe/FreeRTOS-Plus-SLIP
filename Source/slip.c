@@ -41,12 +41,12 @@ static uint8_t ucEscEsc[] = {ESC, ESC};
 
 typedef struct SLIP
 {
-	MessageBufferHandle_t hRxMessageBuffer;
-	MessageBufferHandle_t hTxMessageBuffer;
-	StreamBufferHandle_t hRxStreamBuffer;
-	StreamBufferHandle_t hTxStreamBuffer;
-	TaskHandle_t hRxTask;
-	TaskHandle_t hTxTask;
+	MessageBufferHandle_t xRxMessageBuffer;
+	MessageBufferHandle_t xTxMessageBuffer;
+	StreamBufferHandle_t xRxStreamBuffer;
+	StreamBufferHandle_t xTxStreamBuffer;
+	TaskHandle_t xRxTask;
+	TaskHandle_t xTxTask;
 } SLIP_t;
 
 /*!
@@ -62,18 +62,18 @@ static portTASK_FUNCTION(prvRxTask, pvParameters)
 	size_t xReceivedBytes = 0UL;
 	for (;;)
 	{
-		xStreamBufferReceive(slip->hRxStreamBuffer, &ucRxByte, sizeof(ucRxByte), portMAX_DELAY);
+		xStreamBufferReceive(slip->xRxStreamBuffer, &ucRxByte, sizeof(ucRxByte), portMAX_DELAY);
 		switch (ucRxByte)
 		{
 		case END:
 			if (xReceivedBytes > 0UL)
 			{
-				xMessageBufferSend(slip->hRxMessageBuffer, ucReceivedBytes, xReceivedBytes, portMAX_DELAY);
+				xMessageBufferSend(slip->xRxMessageBuffer, ucReceivedBytes, xReceivedBytes, portMAX_DELAY);
 				xReceivedBytes = 0UL;
 			}
 			break;
 		case ESC:
-			xStreamBufferReceive(slip->hRxStreamBuffer, &ucRxByte, sizeof(ucRxByte), portMAX_DELAY);
+			xStreamBufferReceive(slip->xRxStreamBuffer, &ucRxByte, sizeof(ucRxByte), portMAX_DELAY);
 			switch (ucRxByte)
 			{
 			case ESC_END:
@@ -127,23 +127,23 @@ static portTASK_FUNCTION(prvTxTask, pvParameters)
 		 * _receives_ it. The term "transmit" here refers to the pipeline as a
 		 * whole.
 		 */
-		size_t xReceivedBytes = prvMessageBufferReceive(slip->hTxMessageBuffer, ucTxData);
-		xMessageBufferSend(slip->hTxStreamBuffer, ucEnd, sizeof(ucEnd), portMAX_DELAY);
+		size_t xReceivedBytes = prvMessageBufferReceive(slip->xTxMessageBuffer, ucTxData);
+		xMessageBufferSend(slip->xTxStreamBuffer, ucEnd, sizeof(ucEnd), portMAX_DELAY);
 		for (size_t x = 0UL; x < xReceivedBytes; x++)
 		{
 			switch (ucTxData[x])
 			{
 			case END:
-				xMessageBufferSend(slip->hTxStreamBuffer, ucEscEnd, sizeof(ucEscEnd), portMAX_DELAY);
+				xMessageBufferSend(slip->xTxStreamBuffer, ucEscEnd, sizeof(ucEscEnd), portMAX_DELAY);
 				break;
 			case ESC:
-				xMessageBufferSend(slip->hTxStreamBuffer, ucEscEsc, sizeof(ucEscEsc), portMAX_DELAY);
+				xMessageBufferSend(slip->xTxStreamBuffer, ucEscEsc, sizeof(ucEscEsc), portMAX_DELAY);
 				break;
 			default:
-				xMessageBufferSend(slip->hTxStreamBuffer, ucTxData + x, sizeof(*ucTxData), portMAX_DELAY);
+				xMessageBufferSend(slip->xTxStreamBuffer, ucTxData + x, sizeof(*ucTxData), portMAX_DELAY);
 			}
 		}
-		xMessageBufferSend(slip->hTxStreamBuffer, ucEnd, sizeof(ucEnd), portMAX_DELAY);
+		xMessageBufferSend(slip->xTxStreamBuffer, ucEnd, sizeof(ucEnd), portMAX_DELAY);
 	}
 }
 
@@ -151,31 +151,31 @@ SLIPHandle_t xSLIPCreate(size_t xBufferSizeBytes, size_t xTriggerLevelBytes)
 {
 	SLIP_t *slip = pvPortMalloc(sizeof(SLIP_t));
 	configASSERT(slip != NULL);
-	slip->hRxMessageBuffer = xMessageBufferCreate(xBufferSizeBytes);
-	slip->hTxMessageBuffer = xMessageBufferCreate(xBufferSizeBytes);
-	slip->hRxStreamBuffer = xStreamBufferCreate(xBufferSizeBytes, xTriggerLevelBytes);
-	slip->hTxStreamBuffer = xStreamBufferCreate(xBufferSizeBytes, xTriggerLevelBytes);
-	xTaskCreate(prvRxTask, "SLIPRx", configMINIMAL_STACK_SIZE + slipMAX_PACKET_LEN, slip, slipRX_PRIORITY, &slip->hRxTask);
-	xTaskCreate(prvTxTask, "SLIPTx", configMINIMAL_STACK_SIZE + slipMAX_PACKET_LEN, slip, slipTX_PRIORITY, &slip->hTxTask);
+	slip->xRxMessageBuffer = xMessageBufferCreate(xBufferSizeBytes);
+	slip->xTxMessageBuffer = xMessageBufferCreate(xBufferSizeBytes);
+	slip->xRxStreamBuffer = xStreamBufferCreate(xBufferSizeBytes, xTriggerLevelBytes);
+	slip->xTxStreamBuffer = xStreamBufferCreate(xBufferSizeBytes, xTriggerLevelBytes);
+	xTaskCreate(prvRxTask, "SLIPRx", configMINIMAL_STACK_SIZE + slipMAX_PACKET_LEN, slip, slipRX_PRIORITY, &slip->xRxTask);
+	xTaskCreate(prvTxTask, "SLIPTx", configMINIMAL_STACK_SIZE + slipMAX_PACKET_LEN, slip, slipTX_PRIORITY, &slip->xTxTask);
 	return slip;
 }
 
 size_t xSLIPReceive(SLIPHandle_t xSLIP, void *pvRxData, size_t xBufferLengthBytes, TickType_t xTicksToWait)
 {
 	SLIP_t *slip = xSLIP;
-	return xMessageBufferReceive(slip->hRxMessageBuffer, pvRxData, xBufferLengthBytes, xTicksToWait);
+	return xMessageBufferReceive(slip->xRxMessageBuffer, pvRxData, xBufferLengthBytes, xTicksToWait);
 }
 
 size_t xSLIPReceiveMalloc(SLIPHandle_t xSLIP, void **ppvRxData, TickType_t xTicksToWait)
 {
 	SLIP_t *slip = xSLIP;
-	return xMessageBufferReceiveMalloc(slip->hRxMessageBuffer, ppvRxData, xTicksToWait);
+	return xMessageBufferReceiveMalloc(slip->xRxMessageBuffer, ppvRxData, xTicksToWait);
 }
 
 size_t xSLIPRxSend(SLIPHandle_t xSLIP, void *pvRxData, size_t xBufferLengthBytes, TickType_t xTicksToWait)
 {
 	SLIP_t *slip = xSLIP;
-	return xStreamBufferSend(slip->hRxStreamBuffer, pvRxData, xBufferLengthBytes, xTicksToWait);
+	return xStreamBufferSend(slip->xRxStreamBuffer, pvRxData, xBufferLengthBytes, xTicksToWait);
 }
 
 size_t xSLIPSend(SLIPHandle_t xSLIP, void *pvTxData, size_t xBufferLengthBytes, TickType_t xTicksToWait)
@@ -183,11 +183,11 @@ size_t xSLIPSend(SLIPHandle_t xSLIP, void *pvTxData, size_t xBufferLengthBytes, 
 	if (xBufferLengthBytes == 0UL) return 0UL;
 	SLIP_t *slip = xSLIP;
 	if (xBufferLengthBytes > slipMAX_PACKET_LEN) xBufferLengthBytes = slipMAX_PACKET_LEN;
-	return xMessageBufferSend(slip->hTxMessageBuffer, pvTxData, xBufferLengthBytes, xTicksToWait);
+	return xMessageBufferSend(slip->xTxMessageBuffer, pvTxData, xBufferLengthBytes, xTicksToWait);
 }
 
 size_t xSLIPTxReceive(SLIPHandle_t xSLIP, void *pvTxData, size_t xBufferLengthBytes, TickType_t xTicksToWait)
 {
 	SLIP_t *slip = xSLIP;
-	return xStreamBufferReceive(slip->hTxStreamBuffer, pvTxData, xBufferLengthBytes, xTicksToWait);
+	return xStreamBufferReceive(slip->xTxStreamBuffer, pvTxData, xBufferLengthBytes, xTicksToWait);
 }
