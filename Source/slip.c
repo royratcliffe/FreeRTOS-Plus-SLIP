@@ -51,8 +51,8 @@ typedef struct SLIP
 
 /*!
  * Receives a stream of bytes. Sends packets after SLIP protocol decoding.
- * Parameters include: a receiver queue handle for input and a message buffer
- * for output.
+ * Parameters include: a receiver stream buffer handle for input and a message
+ * buffer for output.
  */
 static portTASK_FUNCTION(prvRxTask, pvParameters)
 {
