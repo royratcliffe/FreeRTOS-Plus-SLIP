@@ -37,11 +37,21 @@ size_t xMessageBufferReceiveMalloc(MessageBufferHandle_t xMessageBuffer, void **
 	{
 		size_t xLengthBytes = xMessageBufferNextLengthBytes(xMessageBuffer);
 		pvRxData = pvPortMalloc(xLengthBytes);
+		if (pvRxData == NULL)
+		{
+			*ppvRxData = NULL;
+			return 0UL;
+		}
 		xReceivedBytes = xMessageBufferReceive(xMessageBuffer, pvRxData, xLengthBytes, xTicksToWait);
 	}
 	else
 	{
 		pvRxData = pvPortMalloc(xReceivedBytes);
+		if (pvRxData == NULL)
+		{
+			*ppvRxData = NULL;
+			return 0UL;
+		}
 		*(uint8_t *)pvRxData = ucRxByte;
 	}
 	*ppvRxData = pvRxData;
