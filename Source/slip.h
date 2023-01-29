@@ -54,6 +54,8 @@ SLIPHandle_t xSLIPCreate(size_t xBufferSizeBytes, size_t xTriggerLevelBytes);
  */
 size_t xSLIPReceive(SLIPHandle_t xSLIP, void *pvRxData, size_t xBufferLengthBytes, TickType_t xTicksToWait);
 
+size_t xSLIPReceiveMalloc(SLIPHandle_t xSLIP, void **ppvRxData, TickType_t xTicksToWait);
+
 /*!
  * Fills the reception stream.
  */

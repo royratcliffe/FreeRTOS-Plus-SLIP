@@ -27,7 +27,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
-#include "message_buffer.h"
+#include "message_buffer_ex.h"
 
 #define END 0300U
 #define ESC 0333U
@@ -164,6 +164,12 @@ size_t xSLIPReceive(SLIPHandle_t xSLIP, void *pvRxData, size_t xBufferLengthByte
 {
 	SLIP_t *slip = xSLIP;
 	return xMessageBufferReceive(slip->hRxMessageBuffer, pvRxData, xBufferLengthBytes, xTicksToWait);
+}
+
+size_t xSLIPReceiveMalloc(SLIPHandle_t xSLIP, void **ppvRxData, TickType_t xTicksToWait)
+{
+	SLIP_t *slip = xSLIP;
+	return xMessageBufferReceiveMalloc(slip->hRxMessageBuffer, ppvRxData, xTicksToWait);
 }
 
 size_t xSLIPRxSend(SLIPHandle_t xSLIP, void *pvRxData, size_t xBufferLengthBytes, TickType_t xTicksToWait)
