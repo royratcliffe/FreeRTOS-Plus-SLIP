@@ -40,6 +40,9 @@
 
 typedef void *SLIPHandle_t;
 
+/*!
+ * Creates a new SLIP intrastructure wrapper dynamically.
+ */
 SLIPHandle_t xSLIPCreate(size_t xBufferSizeBytes, size_t xTriggerLevelBytes);
 
 /*!
@@ -47,6 +50,9 @@ SLIPHandle_t xSLIPCreate(size_t xBufferSizeBytes, size_t xTriggerLevelBytes);
  */
 size_t xSLIPReceive(SLIPHandle_t xSLIP, void *pvRxData, size_t xBufferLengthBytes, TickType_t xTicksToWait);
 
+/*!
+ * Fills the reception stream.
+ */
 size_t xSLIPRxSend(SLIPHandle_t xSLIP, void *pvRxData, size_t xBufferLengthBytes, TickType_t xTicksToWait);
 
 /*!
@@ -60,6 +66,8 @@ size_t xSLIPRxSend(SLIPHandle_t xSLIP, void *pvRxData, size_t xBufferLengthBytes
 size_t xSLIPSend(SLIPHandle_t xSLIP, void *pvTxData, size_t xBufferLengthBytes, TickType_t xTicksToWait);
 
 /*!
+ * Empties the transmission stream.
+ *
  * Receives transmission data from the transmitter stream.
  */
 size_t xSLIPTxReceive(SLIPHandle_t xSLIP, void *pvTxData, size_t xBufferLengthBytes, TickType_t xTicksToWait);
