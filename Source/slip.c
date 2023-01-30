@@ -53,6 +53,11 @@ typedef struct SLIP
  * Receives a stream of bytes. Sends packets after SLIP protocol decoding.
  * Parameters include: a receiver stream buffer handle for input and a message
  * buffer for output.
+ *
+ * Importantly, the receives does _not_ require an initial 'end' in order to
+ * enter packet framing mode. The receiver starts in frame mode and remains
+ * there. Hence, strictly speaking, the transmitter can omit the double-ended
+ * inter-packet octets.
  */
 static portTASK_FUNCTION(prvRxTask, pvParameters)
 {
