@@ -157,6 +157,8 @@ SLIPHandle_t xSLIPCreate(size_t xBufferSizeBytes, size_t xTriggerLevelBytes)
 	slip->xTxStreamBuffer = xStreamBufferCreate(xBufferSizeBytes, xTriggerLevelBytes);
 	xTaskCreate(prvRxTask, "SLIPRx", configMINIMAL_STACK_SIZE + slipMAX_PACKET_LEN, slip, slipRX_PRIORITY, &slip->xRxTask);
 	xTaskCreate(prvTxTask, "SLIPTx", configMINIMAL_STACK_SIZE + slipMAX_PACKET_LEN, slip, slipTX_PRIORITY, &slip->xTxTask);
+	configASSERT(slip->xRxTask != NULL);
+	configASSERT(slip->xTxTask != NULL);
 	return slip;
 }
 
