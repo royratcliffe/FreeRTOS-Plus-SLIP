@@ -41,7 +41,7 @@
 typedef void *SLIPHandle_t;
 
 /*!
- * Creates a new SLIP intrastructure wrapper dynamically.
+ * Creates a new SLIP infrastructure wrapper dynamically.
  *
  * Creates a new receiver and transmitter task with the necessary stack sizes,
  * amounting to minimal size plus the maximum packet length. Reserve sufficient
