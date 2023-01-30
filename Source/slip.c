@@ -162,6 +162,18 @@ SLIPHandle_t xSLIPCreate(size_t xBufferSizeBytes, size_t xTriggerLevelBytes)
 	return slip;
 }
 
+void vSLIPDelete(SLIPHandle_t xSLIP)
+{
+	SLIP_t *slip = xSLIP;
+	vTaskDelete(slip->xTxTask);
+	vTaskDelete(slip->xRxTask);
+	vStreamBufferDelete(slip->xTxStreamBuffer);
+	vStreamBufferDelete(slip->xRxStreamBuffer);
+	vMessageBufferDelete(slip->xTxMessageBuffer);
+	vMessageBufferDelete(slip->xRxMessageBuffer);
+	vPortFree(slip);
+}
+
 size_t xSLIPReceive(SLIPHandle_t xSLIP, void *pvRxData, size_t xBufferLengthBytes, TickType_t xTicksToWait)
 {
 	SLIP_t *slip = xSLIP;

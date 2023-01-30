@@ -50,6 +50,13 @@ typedef void *SLIPHandle_t;
 SLIPHandle_t xSLIPCreate(size_t xBufferSizeBytes, size_t xTriggerLevelBytes);
 
 /*!
+ * Deletes SLIP infrastructure.
+ *
+ * Deletes tasks, stream buffers and message buffers in reverse order.
+ */
+void vSLIPDelete(SLIPHandle_t xSLIP);
+
+/*!
  * Receives a packet.
  */
 size_t xSLIPReceive(SLIPHandle_t xSLIP, void *pvRxData, size_t xBufferLengthBytes, TickType_t xTicksToWait);
